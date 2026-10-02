@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZEO Robux Simulator</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f2f2f2;
+    color: #111;
+}
+
+.topbar {
+    height: 64px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7%;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.logo-icon {
+    width: 30px;
+    height: 30px;
+    background: #111;
+    transform: rotate(45deg);
+    border-radius: 5px;
+    position: relative;
+}
+
+.logo-icon::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: white;
+    border-radius: 2px;
+    top: 10px;
+    left: 10px;
+}
+
+.nav {
+    display: flex;
+    gap: 28px;
+}
+
+.nav a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 600;
+}
+
+.nav a:hover {
+    color: #000;
+}
+
+.badge {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    background: #222;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 7px 10px;
+    border-radius: 5px;
+    z-index: 50;
+}
+
+.container {
+    width: min(1100px, 92%);
+    margin: auto;
+}
+
+.hero {
+    text-align: center;
+    padding: 55px 0 35px;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: #666;
+    font-size: 17px;
+}
+
+.balance {
+    margin: 25px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 22px;
+    max-width: 400px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.balance small {
+    color: #777;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.balance strong {
+    font-size: 32px;
+}
+
+.section-title {
+    font-size: 25px;
+    margin: 30px 0 18px;
+}
+
+.packages {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.package {
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 25px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: .2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.package:hover {
+    transform: translateY(-3px);
+    border-color: #111;
+}
+
+.package.selected {
+    border-color: #111;
+}
+
+.robux {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.package span {
+    color: #777;
+}
+
+.transfer {
+    background: white;
+    margin: 45px 0;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.transfer h2 {
+    margin-bottom: 8px;
+}
+
+.transfer-description {
+    color: #666;
+    margin-bottom: 22px;
+}
+
+.search-row {
+    display: flex;
+    gap: 10px;
+}
+
+input {
+    flex: 1;
+    height: 48px;
+    border: 1px solid #bbb;
+    border-radius: 7px;
+    padding: 0 15px;
+    font-size: 16px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #111;
+}
+
+button {
+    height: 48px;
+    border: none;
+    border-radius: 7px;
+    padding: 0 22px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.search-btn {
+    background: #111;
+    color: white;
+}
+
+.search-btn:hover {
+    background: #333;
+}
+
+.profile {
+    display: none;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+    padding: 18px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.profile img {
+    width: 75px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #eee;
+}
+
+.profile-info h3 {
+    margin-bottom: 5px;
+}
+
+.profile-info p {
+    color: #666;
+    margin: 3px 0;
+}
+
+.selected-box {
+    margin-top: 22px;
+    padding: 17px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selected-box strong {
+    font-size: 22px;
+}
+
+.send-btn {
+    width: 100%;
+    margin-top: 15px;
+    background: #111;
+    color: white;
+}
+
+.send-btn:hover {
+    background: #333;
+}
+
+.status {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #555;
+    min-height: 20px;
+}
+
+footer {
+    text-align: center;
+    padding: 35px;
+    color: #777;
+    font-size: 13px;
+}
+
+@media (max-width: 800px) {
+    .packages {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .nav {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 500px) {
+    .packages {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .package {
+        padding: 20px 8px;
+    }
+
+    .robux {
+        font-size: 23px;
+    }
+
+    .search-row {
+        flex-direction: column;
+    }
+
+    .search-btn {
+        width: 100%;
+    }
+
+    .transfer {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="logo">
+        <div class="logo-icon"></div>
+        Roblox
+    </div>
+
+    <nav class="nav">
+        <a href="#">Discover</a>
+        <a href="#">Marketplace</a>
+        <a href="#robux">Robux</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <section class="hero">
+        <h1>Get Robux</h1>
+        <p>Choose an amount a Robux transfer.</p>
+
+        <div class="balance">
+            <small>Simulated Balance</small>
+            <strong>R$ 1,000,000,000</strong>
+        </div>
+    </section>
+
+    <section id="robux">
+        <h2 class="section-title">Choose Robux</h2>
+
+        <div class="packages">
+
+            <div class="package" onclick="selectPackage(400, this)">
+                <div class="robux">R$400</div>
+                <span>Robux</span>
+            </div>
+
+            <div class="package" onclick="selectPackage(800, this)">
+                <div class="robux">R$800</div>
+                <span>Robux</span>
+            </div>
+
+            <div class="package" onclick="selectPackage(1700, this)">
+                <div class="robux">R$1,700</div>
+                <span>Robux</span>
+            </div>
+
+            <div class="package" onclick="selectPackage(4500, this)">
+                <div class="robux">R$4,500</div>
+                <span>Robux</span>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="transfer">
+
+        <h2>Send Robux</h2>
+
+        <p class="transfer-description">
+            Search for a public Roblox username.
+        </p>
+
+        <div class="search-row">
+            <input
+                id="username"
+                type="text"
+                placeholder="Enter Roblox username"
+                autocomplete="off"
+            >
+
+            <button
+                class="search-btn"
+                id="searchButton"
+                onclick="searchUser()"
+            >
+                Search
+            </button>
+        </div>
+
+        <div class="profile" id="profile">
+
+            <img id="avatar" src="" alt="Avatar">
+
+            <div class="profile-info">
+                <h3 id="displayName">Player</h3>
+                <p id="usernameResult">@username</p>
+                <p id="userId">User ID</p>
+            </div>
+
+        </div>
+
+        <div class="selected-box">
+            <span>Selected amount</span>
+            <strong id="selectedAmount">R$0</strong>
+        </div>
+
+        <button class="send-btn" onclick="sendRobux()">
+            Continue
+        </button>
+
+        <div class="status" id="status"></div>
+
+    </section>
+
+</div>
+
+<footer>
+     Robux Transfer
+</footer>
+
+<div class="badge">
+    OFFICIAL app
+</div>
+
+<script>
+
+let selectedUser = null;
+let selectedRobux = 0;
+
+const usernameInput = document.getElementById("username");
+const statusText = document.getElementById("status");
+const profile = document.getElementById("profile");
+const searchButton = document.getElementById("searchButton");
+
+async function getJSON(url) {
+
+    try {
+
+        const response = await fetch(url);
+
+        if (response.ok) {
+            return await response.json();
+        }
+
+    } catch (error) {
+        console.log("Direct request failed");
+    }
+
+    const proxy =
+        "https://api.allorigins.win/raw?url=" +
+        encodeURIComponent(url);
+
+    const response = await fetch(proxy);
+
+    if (!response.ok) {
+        throw new Error("Unable to reach Roblox.");
+    }
+
+    return await response.json();
+}
+
+async function searchUser() {
+
+    const username = usernameInput.value.trim();
+
+    profile.style.display = "none";
+    selectedUser = null;
+
+    if (!username) {
+        statusText.textContent = "Enter a username.";
+        return;
+    }
+
+    searchButton.disabled = true;
+    statusText.textContent = "Searching...";
+
+    try {
+
+        const url =
+            "https://users.roblox.com/v1/users/search" +
+            "?keyword=" +
+            encodeURIComponent(username) +
+            "&limit=10";
+
+        const data = await getJSON(url);
+
+        const users = data.data || [];
+
+        if (!users.length) {
+            throw new Error("User not found.");
+        }
+
+        const exact = users.find(
+            user =>
+                user.name.toLowerCase() ===
+                username.toLowerCase()
+        );
+
+        const user = exact || users[0];
+
+        selectedUser = user;
+
+        document.getElementById("displayName").textContent =
+            user.displayName || user.name;
+
+        document.getElementById("usernameResult").textContent =
+            "@" + user.name;
+
+        document.getElementById("userId").textContent =
+            "User ID: " + user.id;
+
+        try {
+
+            const avatarURL =
+                "https://thumbnails.roblox.com/v1/users/avatar-headshot" +
+                "?userIds=" +
+                user.id +
+                "&size=150x150" +
+                "&format=Png" +
+                "&isCircular=false";
+
+            const avatarData =
+                await getJSON(avatarURL);
+
+            const image =
+                avatarData.data?.[0]?.imageUrl;
+
+            if (image) {
+                document.getElementById("avatar").src = image;
+            }
+
+        } catch (error) {
+
+            console.log("Avatar unavailable");
+
+        }
+
+        profile.style.display = "flex";
+
+        statusText.textContent =
+            "User found.";
+
+    } catch (error) {
+
+        statusText.textContent =
+            error.message || "Search failed.";
+
+    } finally {
+
+        searchButton.disabled = false;
+
+    }
+}
+
+function selectPackage(amount, element) {
+
+    selectedRobux = amount;
+
+    document
+        .querySelectorAll(".package")
+        .forEach(card => {
+            card.classList.remove("selected");
+        });
+
+    element.classList.add("selected");
+
+    document.getElementById("selectedAmount").textContent =
+        "R$" + amount.toLocaleString();
+
+    document.querySelector(".transfer").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+}
+
+function sendRobux() {
+
+    if (!selectedUser) {
+
+        statusText.textContent =
+            "Choose a Roblox user first.";
+
+        return;
+    }
+
+    if (!selectedRobux) {
+
+        statusText.textContent =
+            "Choose a Robux amount first.";
+
+        return;
+    }
+
+    statusText.textContent =
+        "Transfer simulation completed: R$" +
+        selectedRobux.toLocaleString() +
+        " → @" +
+        selectedUser.name;
+}
+
+usernameInput.addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+        searchUser();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
